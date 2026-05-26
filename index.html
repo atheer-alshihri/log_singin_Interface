@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auth App — Login & Register</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <div class="app-wrapper">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar__icon" aria-hidden="true">
+        <i class="ti ti-shield-lock"></i>
+      </div>
+      <h1 class="sidebar__title">Welcome!</h1>
+      <p class="sidebar__sub">Sign in or create a new account to continue.</p>
+      <div class="sidebar__dots" aria-hidden="true">
+        <span class="dot active" id="dot-login"></span>
+        <span class="dot" id="dot-register"></span>
+        <span class="dot" id="dot-forgot"></span>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main">
+
+      <!-- Tab bar -->
+      <nav class="tab-bar" role="tablist">
+        <button class="tab active" data-tab="login" role="tab" aria-selected="true">Login</button>
+        <button class="tab" data-tab="register" role="tab" aria-selected="false">Register</button>
+        <button class="tab" data-tab="forgot" role="tab" aria-selected="false">Forgot Password</button>
+      </nav>
+
+      <!-- Alert message -->
+      <div class="alert hidden" id="alert" role="alert"></div>
+
+      <!-- ── LOGIN PANEL ── -->
+      <section class="panel active" id="panel-login" aria-labelledby="tab-login">
+        <h2 class="panel__heading">Sign in to your account</h2>
+
+        <div class="field">
+          <label for="l-email">Email address</label>
+          <div class="input-wrap">
+            <i class="ti ti-mail" aria-hidden="true"></i>
+            <input type="email" id="l-email" placeholder="you@example.com" autocomplete="email" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="l-pass">Password</label>
+          <div class="input-wrap">
+            <i class="ti ti-lock" aria-hidden="true"></i>
+            <input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password" />
+            <button class="toggle-pass" type="button" aria-label="Toggle password visibility" data-target="l-pass">
+              <i class="ti ti-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="row-between">
+          <label class="checkbox-label">
+            <input type="checkbox" id="remember" />
+            <span>Remember me</span>
+          </label>
+          <button class="link-btn" data-goto="forgot">Forgot password?</button>
+        </div>
+
+        <button class="btn-primary" id="btn-login">
+          <i class="ti ti-login" aria-hidden="true"></i> Sign in
+        </button>
+
+        <div class="divider"><span>or continue with</span></div>
+
+        <div class="social-row">
+          <button class="btn-social" aria-label="Sign in with Google">
+            <i class="ti ti-brand-google" aria-hidden="true"></i> Google
+          </button>
+          <button class="btn-social" aria-label="Sign in with GitHub">
+            <i class="ti ti-brand-github" aria-hidden="true"></i> GitHub
+          </button>
+        </div>
+
+        <p class="switch-text">
+          Don't have an account?
+          <button class="link-btn" data-goto="register">Create one</button>
+        </p>
+      </section>
+
+      <!-- ── REGISTER PANEL ── -->
+      <section class="panel" id="panel-register" aria-labelledby="tab-register">
+        <h2 class="panel__heading">Create your account</h2>
+
+        <div class="grid-2">
+          <div class="field">
+            <label for="r-fname">First name</label>
+            <div class="input-wrap">
+              <i class="ti ti-user" aria-hidden="true"></i>
+              <input type="text" id="r-fname" placeholder="John" autocomplete="given-name" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="r-lname">Last name</label>
+            <div class="input-wrap">
+              <i class="ti ti-user" aria-hidden="true"></i>
+              <input type="text" id="r-lname" placeholder="Doe" autocomplete="family-name" />
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="r-email">Email address</label>
+          <div class="input-wrap">
+            <i class="ti ti-mail" aria-hidden="true"></i>
+            <input type="email" id="r-email" placeholder="you@example.com" autocomplete="email" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="r-pass">Password</label>
+          <div class="input-wrap">
+            <i class="ti ti-lock" aria-hidden="true"></i>
+            <input type="password" id="r-pass" placeholder="••••••••" autocomplete="new-password" />
+            <button class="toggle-pass" type="button" aria-label="Toggle password visibility" data-target="r-pass">
+              <i class="ti ti-eye"></i>
+            </button>
+          </div>
+          <div class="strength-bar" aria-hidden="true">
+            <span class="bar" id="bar1"></span>
+            <span class="bar" id="bar2"></span>
+            <span class="bar" id="bar3"></span>
+          </div>
+          <p class="strength-label" id="strength-text"></p>
+        </div>
+
+        <div class="field">
+          <label for="r-pass2">Confirm password</label>
+          <div class="input-wrap">
+            <i class="ti ti-lock-check" aria-hidden="true"></i>
+            <input type="password" id="r-pass2" placeholder="••••••••" autocomplete="new-password" />
+          </div>
+        </div>
+
+        <label class="checkbox-label">
+          <input type="checkbox" id="terms" />
+          <span>I agree to the <a href="#" class="inline-link">Terms &amp; Conditions</a></span>
+        </label>
+
+        <button class="btn-primary" id="btn-register">
+          <i class="ti ti-user-plus" aria-hidden="true"></i> Create account
+        </button>
+
+        <p class="switch-text">
+          Already have an account?
+          <button class="link-btn" data-goto="login">Sign in</button>
+        </p>
+      </section>
+
+      <!-- ── FORGOT PASSWORD PANEL ── -->
+      <section class="panel" id="panel-forgot" aria-labelledby="tab-forgot">
+        <div class="forgot-icon" aria-hidden="true">
+          <i class="ti ti-mail-forward"></i>
+        </div>
+        <h2 class="panel__heading">Reset your password</h2>
+        <p class="panel__sub">Enter your email and we'll send you a reset link.</p>
+
+        <div class="field">
+          <label for="f-email">Email address</label>
+          <div class="input-wrap">
+            <i class="ti ti-mail" aria-hidden="true"></i>
+            <input type="email" id="f-email" placeholder="you@example.com" autocomplete="email" />
+          </div>
+        </div>
+
+        <button class="btn-primary" id="btn-forgot">
+          <i class="ti ti-send" aria-hidden="true"></i> Send reset link
+        </button>
+
+        <p class="switch-text">
+          Remembered it?
+          <button class="link-btn" data-goto="login">Back to login</button>
+        </p>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
