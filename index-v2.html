@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auth App — Login & Register</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f172a;
+      --bg2:       #1e293b;
+      --sidebar:   #0e4f6e;
+      --acc:       #e94560;
+      --acc-h:     #c73652;
+      --acc2:      #f59e0b;
+      --fg:        #f1f5f9;
+      --fg2:       #94a3b8;
+      --inp:       #162032;
+      --inp-b:     #2d3f55;
+      --inp-f:     #38bdf8;
+      --radius:    10px;
+      --radius-lg: 18px;
+      --success:   #22c55e;
+      --danger:    #ef4444;
+      --warn:      #f59e0b;
+      --trans:     all 0.22s ease;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 15px;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    /* ── wrapper ── */
+    .app-wrapper {
+      display: flex;
+      width: 100%;
+      max-width: 780px;
+      min-height: 560px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 30px 70px rgba(0,0,0,0.55);
+    }
+
+    /* ── sidebar ── */
+    .sidebar {
+      width: 230px;
+      flex-shrink: 0;
+      background: linear-gradient(160deg, var(--sidebar) 0%, #4f1d96 120%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem 1.5rem;
+      gap: 0.8rem;
+      text-align: center;
+    }
+    .sidebar__icon {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; color: #fff;
+      margin-bottom: 0.4rem;
+    }
+    .sidebar__title { font-size: 1.3rem; font-weight: 600; color: #fff; }
+    .sidebar__sub   { font-size: 0.78rem; color: rgba(255,255,255,0.65); line-height: 1.55; }
+    .sidebar__dots  { display: flex; gap: 6px; margin-top: 1.5rem; }
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      transition: var(--trans);
+    }
+    .dot.active { background: #fff; width: 24px; border-radius: 4px; }
+
+    /* ── main ── */
+    .main {
+      flex: 1;
+      background: var(--bg2);
+      padding: 2rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    /* ── tab bar ── */
+    .tab-bar {
+      display: flex;
+      background: rgba(255,255,255,0.05);
+      border-radius: var(--radius);
+      padding: 4px; gap: 4px;
+      margin-bottom: 1.5rem;
+    }
+    .tab {
+      flex: 1; padding: 8px 4px;
+      font-size: 0.75rem; font-weight: 500;
+      border: none; border-radius: 7px;
+      background: transparent; color: var(--fg2);
+      cursor: pointer; transition: var(--trans);
+      font-family: inherit;
+    }
+    .tab:hover { color: var(--fg); }
+    .tab.active { background: var(--acc); color: #fff; }
+
+    /* ── alert ── */
+    .alert {
+      padding: 10px 14px; border-radius: var(--radius);
+      font-size: 0.83rem; margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .alert.success { background: rgba(34,197,94,.12); color: var(--success); border: 1px solid rgba(34,197,94,.25); }
+    .alert.error   { background: rgba(239,68,68,.12);  color: var(--danger);  border: 1px solid rgba(239,68,68,.25); }
+    .alert.hidden  { display: none; }
+
+    /* ── panels ── */
+    .panel { display: none; flex-direction: column; gap: 1rem; }
+    .panel.active { display: flex; }
+
+    .panel__heading { font-size: 1.05rem; font-weight: 600; color: var(--fg); }
+    .panel__sub     { font-size: 0.8rem; color: var(--fg2); margin-top: -.5rem; line-height: 1.5; }
+
+    /* ── fields ── */
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 0.78rem; font-weight: 500; color: var(--fg2); }
+
+    .input-wrap { position: relative; display: flex; align-items: center; }
+    .input-wrap > .ti {
+      position: absolute; left: 12px;
+      font-size: 15px; color: var(--fg2); pointer-events: none;
+    }
+    .input-wrap input {
+      width: 100%;
+      padding: 10px 12px 10px 38px;
+      background: var(--inp);
+      border: 1px solid var(--inp-b);
+      border-radius: var(--radius);
+      color: var(--fg); font-size: 0.88rem;
+      font-family: inherit; outline: none;
+      transition: var(--trans);
+    }
+    .input-wrap input:focus {
+      border-color: var(--inp-f);
+      box-shadow: 0 0 0 3px rgba(56,189,248,.12);
+    }
+    .input-wrap input::placeholder { color: #3d5068; }
+
+    .toggle-pass {
+      position: absolute; right: 10px;
+      background: none; border: none;
+      color: var(--fg2); cursor: pointer;
+      font-size: 15px; display: flex; padding: 4px;
+      transition: color 0.2s;
+    }
+    .toggle-pass:hover { color: var(--fg); }
+
+    /* ── strength ── */
+    .strength-bar { display: flex; gap: 5px; margin-top: 3px; }
+    .bar { flex: 1; height: 3px; border-radius: 2px; background: var(--inp-b); transition: background .3s; }
+    .bar.weak   { background: var(--danger); }
+    .bar.medium { background: var(--warn); }
+    .bar.strong { background: var(--success); }
+    .strength-label { font-size: 0.72rem; color: var(--fg2); min-height: 1rem; }
+
+    /* ── grid ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .row-between { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+
+    .checkbox-label {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.8rem; color: var(--fg2);
+      cursor: pointer; user-select: none;
+    }
+    .checkbox-label input[type="checkbox"] {
+      accent-color: var(--acc); width: 15px; height: 15px; cursor: pointer;
+    }
+
+    /* ── buttons ── */
+    .btn-primary {
+      width: 100%; padding: 11px;
+      background: var(--acc); border: none;
+      border-radius: var(--radius);
+      color: #fff; font-size: 0.9rem; font-weight: 600;
+      font-family: inherit; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: var(--trans); margin-top: 0.15rem;
+    }
+    .btn-primary:hover  { background: var(--acc-h); }
+    .btn-primary:active { transform: scale(0.98); }
+
+    .link-btn {
+      background: none; border: none; color: var(--acc2);
+      font-size: 0.8rem; cursor: pointer; font-family: inherit;
+      text-decoration: underline; text-underline-offset: 3px;
+      padding: 0; transition: opacity .2s;
+    }
+    .link-btn:hover { opacity: .75; }
+    .inline-link { color: var(--acc2); text-decoration: underline; }
+
+    /* ── divider ── */
+    .divider { display: flex; align-items: center; gap: 10px; color: var(--fg2); font-size: 0.75rem; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--inp-b); }
+
+    /* ── social ── */
+    .social-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .btn-social {
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      padding: 9px;
+      background: var(--inp); border: 1px solid var(--inp-b);
+      border-radius: var(--radius);
+      color: var(--fg2); font-size: 0.82rem; font-family: inherit;
+      cursor: pointer; transition: var(--trans);
+    }
+    .btn-social:hover { background: #1d3045; color: var(--fg); }
+
+    .switch-text { text-align: center; font-size: 0.8rem; color: var(--fg2); }
+
+    .forgot-icon {
+      width: 54px; height: 54px; border-radius: 50%;
+      background: rgba(233,69,96,.12);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; color: var(--acc); margin: 0 auto .25rem;
+    }
+
+    /* ── responsive ── */
+    @media (max-width: 580px) {
+      .sidebar { display: none; }
+      .main    { padding: 1.5rem; }
+      .grid-2  { grid-template-columns: 1fr; }
+      .tab     { font-size: 0.68rem; padding: 7px 3px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-wrapper">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar__icon" aria-hidden="true">
+      <i class="ti ti-shield-lock"></i>
+    </div>
+    <h1 class="sidebar__title">Welcome!</h1>
+    <p class="sidebar__sub">Sign in or create a new account to continue.</p>
+    <div class="sidebar__dots" aria-hidden="true">
+      <span class="dot active" id="dot-login"></span>
+      <span class="dot" id="dot-register"></span>
+      <span class="dot" id="dot-forgot"></span>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <nav class="tab-bar" role="tablist">
+      <button class="tab active" data-tab="login"    role="tab" aria-selected="true">Login</button>
+      <button class="tab"        data-tab="register" role="tab" aria-selected="false">Register</button>
+      <button class="tab"        data-tab="forgot"   role="tab" aria-selected="false">Forgot Password</button>
+    </nav>
+
+    <div class="alert hidden" id="alert" role="alert"></div>
+
+    <!-- LOGIN -->
+    <section class="panel active" id="panel-login">
+      <h2 class="panel__heading">Sign in to your account</h2>
+
+      <div class="field">
+        <label for="l-email">Email address</label>
+        <div class="input-wrap">
+          <i class="ti ti-mail" aria-hidden="true"></i>
+          <input type="email" id="l-email" placeholder="you@example.com" autocomplete="email" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="l-pass">Password</label>
+        <div class="input-wrap">
+          <i class="ti ti-lock" aria-hidden="true"></i>
+          <input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password" />
+          <button class="toggle-pass" type="button" aria-label="Show password" data-target="l-pass">
+            <i class="ti ti-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="row-between">
+        <label class="checkbox-label">
+          <input type="checkbox" id="remember" />
+          <span>Remember me</span>
+        </label>
+        <button class="link-btn" data-goto="forgot">Forgot password?</button>
+      </div>
+
+      <button class="btn-primary" id="btn-login">
+        <i class="ti ti-login" aria-hidden="true"></i> Sign in
+      </button>
+
+      <div class="divider"><span>or continue with</span></div>
+
+      <div class="social-row">
+        <button class="btn-social" id="btn-google">
+          <i class="ti ti-brand-google" aria-hidden="true"></i> Google
+        </button>
+        <button class="btn-social" id="btn-github">
+          <i class="ti ti-brand-github" aria-hidden="true"></i> GitHub
+        </button>
+      </div>
+
+      <p class="switch-text">
+        Don't have an account?
+        <button class="link-btn" data-goto="register">Create one</button>
+      </p>
+    </section>
+
+    <!-- REGISTER -->
+    <section class="panel" id="panel-register">
+      <h2 class="panel__heading">Create your account</h2>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="r-fname">First name</label>
+          <div class="input-wrap">
+            <i class="ti ti-user" aria-hidden="true"></i>
+            <input type="text" id="r-fname" placeholder="John" autocomplete="given-name" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="r-lname">Last name</label>
+          <div class="input-wrap">
+            <i class="ti ti-user" aria-hidden="true"></i>
+            <input type="text" id="r-lname" placeholder="Doe" autocomplete="family-name" />
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="r-email">Email address</label>
+        <div class="input-wrap">
+          <i class="ti ti-mail" aria-hidden="true"></i>
+          <input type="email" id="r-email" placeholder="you@example.com" autocomplete="email" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="r-pass">Password</label>
+        <div class="input-wrap">
+          <i class="ti ti-lock" aria-hidden="true"></i>
+          <input type="password" id="r-pass" placeholder="••••••••" autocomplete="new-password" />
+          <button class="toggle-pass" type="button" aria-label="Show password" data-target="r-pass">
+            <i class="ti ti-eye"></i>
+          </button>
+        </div>
+        <div class="strength-bar" aria-hidden="true">
+          <span class="bar" id="bar1"></span>
+          <span class="bar" id="bar2"></span>
+          <span class="bar" id="bar3"></span>
+        </div>
+        <p class="strength-label" id="strength-text"></p>
+      </div>
+
+      <div class="field">
+        <label for="r-pass2">Confirm password</label>
+        <div class="input-wrap">
+          <i class="ti ti-lock-check" aria-hidden="true"></i>
+          <input type="password" id="r-pass2" placeholder="••••••••" autocomplete="new-password" />
+        </div>
+      </div>
+
+      <label class="checkbox-label">
+        <input type="checkbox" id="terms" />
+        <span>I agree to the <a href="#" class="inline-link">Terms &amp; Conditions</a></span>
+      </label>
+
+      <button class="btn-primary" id="btn-register">
+        <i class="ti ti-user-plus" aria-hidden="true"></i> Create account
+      </button>
+
+      <p class="switch-text">
+        Already have an account?
+        <button class="link-btn" data-goto="login">Sign in</button>
+      </p>
+    </section>
+
+    <!-- FORGOT -->
+    <section class="panel" id="panel-forgot">
+      <div class="forgot-icon" aria-hidden="true">
+        <i class="ti ti-mail-forward"></i>
+      </div>
+      <h2 class="panel__heading" style="text-align:center">Reset your password</h2>
+      <p class="panel__sub" style="text-align:center;margin-top:-.25rem">
+        Enter your email and we'll send you a reset link.
+      </p>
+
+      <div class="field">
+        <label for="f-email">Email address</label>
+        <div class="input-wrap">
+          <i class="ti ti-mail" aria-hidden="true"></i>
+          <input type="email" id="f-email" placeholder="you@example.com" autocomplete="email" />
+        </div>
+      </div>
+
+      <button class="btn-primary" id="btn-forgot">
+        <i class="ti ti-send" aria-hidden="true"></i> Send reset link
+      </button>
+
+      <p class="switch-text">
+        Remembered it?
+        <button class="link-btn" data-goto="login">Back to login</button>
+      </p>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const users = {};
+  const $ = id => document.getElementById(id);
+  const isEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+
+  async function hashPassword(pw) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  function pwStrength(pw) {
+    let s = 0;
+    if (pw.length >= 6) s++;
+    if (/[A-Z]/.test(pw) || /[0-9]/.test(pw)) s++;
+    if (pw.length >= 10 && /[^a-zA-Z0-9]/.test(pw)) s++;
+    return s;
+  }
+
+  function showAlert(msg, type = 'success') {
+    const el = $('alert');
+    el.className = `alert ${type}`;
+    el.innerHTML = `<i class="ti ti-${type === 'success' ? 'circle-check' : 'alert-circle'}"></i> ${msg}`;
+  }
+
+  function clearAlert() { $('alert').className = 'alert hidden'; }
+
+  const DOTS = { login:'dot-login', register:'dot-register', forgot:'dot-forgot' };
+
+  function showTab(name) {
+    document.querySelectorAll('.tab').forEach(t => {
+      const on = t.dataset.tab === name;
+      t.classList.toggle('active', on);
+      t.setAttribute('aria-selected', on);
+    });
+    document.querySelectorAll('.panel').forEach(p =>
+      p.classList.toggle('active', p.id === `panel-${name}`)
+    );
+    Object.entries(DOTS).forEach(([k,id]) => $(id).classList.toggle('active', k === name));
+    clearAlert();
+  }
+
+  // Toggle password visibility
+  document.querySelectorAll('.toggle-pass').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const inp = $(btn.dataset.target);
+      const hide = inp.type === 'password';
+      inp.type = hide ? 'text' : 'password';
+      btn.querySelector('i').className = `ti ti-eye${hide ? '-off' : ''}`;
+    });
+  });
+
+  // Password strength
+  $('r-pass').addEventListener('input', () => {
+    const pw = $('r-pass').value;
+    const s = pwStrength(pw);
+    const bars = [$('bar1'), $('bar2'), $('bar3')];
+    const cls  = ['weak', 'medium', 'strong'];
+    const lbls = ['', 'Weak', 'Fair', 'Strong'];
+    const cols = ['', '#ef4444', '#f59e0b', '#22c55e'];
+    bars.forEach((b,i) => b.className = 'bar' + (i < s ? ` ${cls[s-1]}` : ''));
+    $('strength-text').textContent  = pw.length ? lbls[s] : '';
+    $('strength-text').style.color  = cols[s];
+  });
+
+  // Login
+  $('btn-login').addEventListener('click', async () => {
+    const email = $('l-email').value.trim();
+    const pw    = $('l-pass').value;
+    if (!email || !pw)   return showAlert('Please fill in all fields.', 'error');
+    if (!isEmail(email)) return showAlert('Enter a valid email address.', 'error');
+    if (!users[email])   return showAlert('No account found with that email.', 'error');
+    const hash = await hashPassword(pw);
+    if (users[email].hash !== hash) return showAlert('Incorrect password.', 'error');
+    showAlert(`Welcome back, ${users[email].name}! 🎉`);
+  });
+
+  // Register
+  $('btn-register').addEventListener('click', async () => {
+    const fname = $('r-fname').value.trim();
+    const lname = $('r-lname').value.trim();
+    const email = $('r-email').value.trim();
+    const pw    = $('r-pass').value;
+    const pw2   = $('r-pass2').value;
+    const terms = $('terms').checked;
+    if (!fname || !email || !pw || !pw2) return showAlert('Please fill in all fields.', 'error');
+    if (!isEmail(email))  return showAlert('Enter a valid email address.', 'error');
+    if (pw !== pw2)       return showAlert('Passwords do not match.', 'error');
+    if (pw.length < 6)    return showAlert('Password must be at least 6 characters.', 'error');
+    if (!terms)           return showAlert('You must agree to the Terms & Conditions.', 'error');
+    if (users[email])     return showAlert('An account with this email already exists.', 'error');
+    const hash = await hashPassword(pw);
+    users[email] = { name: `${fname} ${lname}`.trim(), hash };
+    showAlert(`Account created! Welcome, ${fname} 🎉`);
+  });
+
+  // Forgot
+  $('btn-forgot').addEventListener('click', () => {
+    const email = $('f-email').value.trim();
+    if (!email || !isEmail(email)) return showAlert('Enter a valid email address.', 'error');
+    showAlert(`Reset link sent to ${email} ✉️`);
+  });
+
+  // Social
+  ['btn-google','btn-github'].forEach(id => {
+    $(id).addEventListener('click', () => {
+      const name = id === 'btn-google' ? 'Google' : 'GitHub';
+      showAlert(`${name} sign-in coming soon!`, 'error');
+    });
+  });
+
+  // Tabs & nav links
+  document.querySelectorAll('.tab').forEach(t =>
+    t.addEventListener('click', () => showTab(t.dataset.tab))
+  );
+  document.querySelectorAll('[data-goto]').forEach(b =>
+    b.addEventListener('click', () => showTab(b.dataset.goto))
+  );
+</script>
+</body>
+</html>
